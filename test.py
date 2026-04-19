@@ -34,7 +34,7 @@ class Planner:
     
     async def run(self) -> dict:
         """Read ques.json, plan the solution, return plan dict."""
-        ques_path = self.workdir / "ques.json"
+        ques_path = self.workdir / "question" /"ques.json"
         if not ques_path.exists():
             raise FileNotFoundError(f"Question file not found: {ques_path}")
         
@@ -68,7 +68,7 @@ class Planner:
             plan = {"raw_response": result.final_response, "steps": []}
         
         # Save plan for builder
-        plan_path = self.workdir / "output" / "plan.json"
+        plan_path = self.workdir / "plan" / "plan.json"
         with open(plan_path, "w") as f:
             json.dump(plan, f, indent=2)
         
@@ -91,7 +91,7 @@ class Builder:
     
     async def run(self, plan: dict = None )-> dict:
         """Read plan.json (or use provided plan), execute steps, return solution."""
-        plan_path = self.workdir / "output" / "plan.json"
+        plan_path = self.workdir / "plan" / "plan.json"
         if not plan_path.exists() and not plan:
             raise FileNotFoundError(f"Plan file not found: {plan_path}")
         
@@ -124,7 +124,7 @@ class Builder:
             solution = {"raw_response": result.final_response}
         
         # Save solution for evaluator
-        solu_path = self.workdir / "output" / "solu.json"
+        solu_path = self.workdir / "solution" / "solu.json"
         with open(solu_path, "w") as f:
             json.dump(solution, f, indent=2)
         
@@ -147,7 +147,7 @@ class Evaluator:
     
     async def run(self, solution: dict = None, original_question: dict = None) -> dict:
         """Read solu.json (or use provided solution), evaluate quality, return assessment."""
-        solu_path = self.workdir / "output" / "solu.json"
+        solu_path = self.workdir / "solution" / "solu.json"
         if not solu_path.exists() and not solution:
             raise FileNotFoundError(f"Solution file not found: {solu_path}")
         
@@ -156,7 +156,7 @@ class Evaluator:
                 solution = json.load(f)
         
         # Load original question if available for context
-        ques_path = self.workdir / "output" / "ques.json"
+        ques_path = self.workdir / "question" / "ques.json"
         question_context = ""
         if ques_path.exists():
             with open(ques_path, "r") as f:
@@ -191,7 +191,7 @@ class Evaluator:
         except json.JSONDecodeError:
             evaluation = {"raw_response": result.final_response, "score": None}
             
-        eval_path = self.workdir / "output" / "eval.json"
+        eval_path = self.workdir / "evaluation" / "eval.json"
         with open(eval_path, "w") as f:
             json.dump(evaluation, f, indent=2)
         
