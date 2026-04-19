@@ -1,0 +1,34 @@
+{
+  "type": "pipeline",
+  "name": "标准构建链",
+  "tasks": [
+    {
+      "name": "规划阶段",
+      "type": "task",
+      "func": "planner"
+    },
+    {
+      "name": "优化循环",
+      "type": "loop",
+      "times": 3,
+      "break_condition": "result.get(\"score\") >= 98",
+      "body": {
+          "type": "pipeline",
+          "name": "构建评估链",
+          "tasks": [
+            {
+              "name": "构建阶段",
+              "type": "task",
+              "func": "builder"
+            },
+            {
+              "name": "评估阶段",
+              "type": "task",
+              "func": "evaluator",
+              "output_key": "eval_result"
+            }
+          ]
+      }
+    }
+  ]
+}
