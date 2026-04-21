@@ -1,0 +1,21 @@
+{
+  "problem": "Find $\\int \\frac{1}{\\sec x} dx.$",
+  "plan": [
+    {
+      "step": "Recognize the trigonometric identity: $\\frac{1}{\\sec x} = \\cos x$",
+      "status": "pending"
+    },
+    {
+      "step": "Rewrite the integral: $\\int \\frac{1}{\\sec x} dx = \\int \\cos x dx$",
+      "status": "pending"
+    },
+    {
+      "step": "Apply the standard integral formula: $\\int \\cos x dx = \\sin x + C$",
+      "status": "pending"
+    },
+    {
+      "step": "State the final answer: $\\sin x + C$",
+      "status": "pending"
+    }
+  ]
+}
