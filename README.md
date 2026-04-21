@@ -112,6 +112,13 @@ python main.py
 2. 读取ques.json中的问题
 3. 按照workflow.json配置执行工作流
 4. 生成结果文件到workspace目录
+  
+如果要解决多个问题，请确保是json列表格式，将题目文件命名为`ques_all.json`并放入题目文件夹中，然后运行：
+
+```bash
+python runner.py
+```
+这种运行方式带有缓存功能。
 
 ## 输出文件
 

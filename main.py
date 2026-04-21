@@ -172,20 +172,9 @@ class Planner:
         
         stream = handle.stream()
         
-
         from codex_app_server._run import _collect_async_run_result
         try:
             result = await _collect_async_run_result(stream, turn_id=handle.id)
-            async for notification in handle.stream():
-                # 异步环境下同样可日志
-                logging.info(f"[{notification.method}] {notification.payload}")
-
-                # 或写入文件
-                with open("log.txt", "a", encoding="utf-8") as f:
-                    f.write(json.dumps({
-                        "method": notification.method,
-                        "payload": notification.payload.model_dump()
-                    }, ensure_ascii=False) + "\n")
             print(result.final_response)  
         finally:
             await stream.aclose()
