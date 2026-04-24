@@ -1,6 +1,18 @@
 {
-  "problem": "find the time a ball fall onto the ground at height H.",
-  "solution": "The time t for a ball to fall from height H to the ground under free fall is:\n\n  t = \u221a(2H / g)\n\nwhere:\n  \u2022 t = time in seconds (s)\n  \u2022 H = initial height in meters (m)\n  \u2022 g = gravitational acceleration \u2248 9.8 m/s\u00b2 (on Earth's surface)\n\nExample: If H = 19.6 m, then t = \u221a(2\u00d719.6 / 9.8) = \u221a4 = 2 seconds.\n\nAssumptions:\n  1. The ball starts from rest (initial velocity v\u2080 = 0)\n  2. Air resistance is negligible\n  3. Gravitational acceleration g is constant over the fall distance\n  4. Motion is purely vertical with no horizontal component\n  5. H is measured in meters for SI unit consistency (if using feet, use g \u2248 32 ft/s\u00b2)\n\nNote: For very large H or high precision applications, variations in g with altitude and air drag may need to be considered.",
-  "advise": "This solution is excellent and pedagogically sound. Strengths: (1) Correct application of kinematic equation H=(1/2)gt\u00b2 with proper algebraic rearrangement; (2) Clear variable definitions with SI units; (3) Verified numerical example (19.6m \u2192 2s is accurate); (4) Comprehensive assumption list that clarifies the idealized model; (5) Helpful note about unit conversion and limitations for extreme cases. Minor enhancement suggestions: explicitly state that only the positive root is physically meaningful for time, and clarify that 'dropped' (not thrown) is implied by v\u2080=0. These are trivial clarifications\u2014the solution is already complete for introductory physics contexts.",
+  "problem": "Find $\\int \\sqrt{1 - x} x^2 dx$",
+  "solution_evaluation": {
+    "correctness": true,
+    "method_appropriateness": "Excellent - substitution u = 1-x is the standard approach for this integral",
+    "step_accuracy": "All integration steps are mathematically correct",
+    "final_answer_equivalence": "The proposed answer $-\\frac{2}{3}(1-x)^{3/2} + \\frac{4}{5}(1-x)^{5/2} - \\frac{2}{7}(1-x)^{7/2} + C$ is algebraically equivalent to the reference answer $-\\frac{2}{105}(\\sqrt{1-x})^3(8+12x+15x^2) + C$ after factoring out $(1-x)^{3/2}$ and combining terms",
+    "verification_quality": "Excellent - includes differentiation check that confirms the antiderivative",
+    "presentation": "Clear, well-organized steps with proper LaTeX formatting"
+  },
+  "advise": [
+    "The solution is mathematically sound and correctly solves the integral",
+    "Consider showing the final algebraic simplification step to demonstrate equivalence with the compact factored form, which would make the answer more elegant",
+    "The verification by differentiation is a best practice that should always be included for indefinite integrals",
+    "Minor note: The plan mentions 'Verify by differentiating' but the verification shown could explicitly state that the chain rule was applied with the inner derivative of (1-x) being -1"
+  ],
   "score": 99
 }

@@ -5,58 +5,10 @@ import time
 from pathlib import Path
 import subprocess
 import sys
-#import atexit
-
-#p=None
-#def router():
-#    global p
-#    p = subprocess.Popen([sys.executable, "python", "router.py"], check=True)
-#def on_exit():
-#    global p
-#    if p:
-#        p.kill()
-
-#atexit.register(on_exit)
-'''
-import httpx
-from httpx import Request, Response
-
-# 日志写入文件（自动追加，自动刷新）
-def write_log(content: str):
-    with open("log.txt", "a", encoding="utf-8") as f:
-        f.write(content + "\n\n")
-        f.flush()  # 立刻写入，不缓存
-
-# 请求日志
-def log_request(request: Request):
-    try:
-        body = request.read().decode("utf-8", errors="replace")
-    except:
-        body = "无法读取请求体"
+import os
+from dataclasses import dataclass
     
-    log = f"→ {request.method} {request.url}\n{body}"
-    print(log)  # 控制台也显示
-    write_log(log)
 
-# 响应日志
-def log_response(response: Response):
-    try:
-        body = response.read().decode("utf-8", errors="replace")
-    except:
-        body = "无法读取响应体"
-    
-    log = f"← {response.status_code}\n{body}"
-    print(log)
-    write_log(log)
-
-# 带日志的客户端
-client = httpx.Client(
-    event_hooks={
-        "request": [log_request],
-        "response": [log_response]
-    }
-)
-'''
 def err_logger(msg: str):
     print(f"\033[91m{msg}\033[0m")
 thisworktime=time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
@@ -73,8 +25,8 @@ def info_logger(msg: str):
 def check_and_install_codex_app_server():
     """检查 codex_app_server 是否存在，如果不存在则自动安装"""
     try:
-        from codex_app_server import AsyncCodex, AppServerConfig, AppServerClient, TextInput,SkillInput
-        return AsyncCodex, AppServerConfig, AppServerClient, TextInput, SkillInput
+        from codex_app_server import AsyncCodex, AppServerConfig, TextInput,SkillInput
+        return AsyncCodex, AppServerConfig, TextInput, SkillInput
     except ImportError:
         print("codex_app_server 未安装，正在自动安装...")
         
@@ -109,8 +61,13 @@ def check_and_install_codex_app_server():
         
         
 
-AsyncCodex, AppServerConfig, AppServerClient,TextInput, SkillInput = check_and_install_codex_app_server()
+AsyncCodex, AppServerConfig, TextInput, SkillInput = check_and_install_codex_app_server()
 
+from codex_app_server.generated.v2_all import (
+      AgentMessageDeltaNotification,
+      TurnCompletedNotification,
+      ErrorNotification,
+  )
 
   
 # 任务注册表，用于存储已注册的任务类
@@ -138,15 +95,23 @@ class Planner:
             return prompt_path.read_text(encoding="utf-8")
         return None
     
-    async def run(self) -> dict:
+    async def run(self,engine) -> dict:
         """读取 ques.json，规划解决方案，返回计划字典"""
         ques_path = self.workdir / "question" / "ques.json"
+        schema_path = self.workdir / "agent" / "planner" / "schemaplan.json"
         if not ques_path.exists():
             err_logger(f"问题文件未找到: {ques_path}")
             exit(1)
         
-        with open(ques_path, "r") as f:
+        with open(ques_path, "r", encoding="utf-8") as f:
             question_data = json.load(f)
+        
+        if not schema_path.exists():
+            err_logger(f"模式文件未找到: {schema_path}")
+            exit(1)
+        
+        with open(schema_path, "r", encoding="utf-8") as f:
+            schema = json.load(f)
         
         # 如果存在 planner.md 则自动加载作为自定义提示
         planner_prompt = self._load_prompt_file("planner.md")
@@ -157,7 +122,8 @@ class Planner:
             if planner_base_prompt:
                 base_instructions = planner_base_prompt
             else:
-                base_instructions = "输出包含步骤、资源和成功标准的有效 JSON。"
+                err_logger(f"基础提示文件未找到: {self.workdir / 'agent' / 'planner' / 'planner_base.md'}")
+                exit(1)
         else:
             err_logger(f"规划提示文件未找到: {self.workdir / 'agent' / 'planner' / 'planner.md'}")
             exit(1)
@@ -167,8 +133,18 @@ class Planner:
             developer_instructions=developer_instructions,
             base_instructions=base_instructions
         )
-        prompt = f"{json.dumps(question_data, indent=2)}"
-        handle = await thread.turn(input = TextInput(prompt))
+
+        if "question" not in question_data:
+            err_logger(f"问题字段未找到: {ques_path}")
+            exit(1)
+        else:
+            prompt = question_data["question"]
+
+        print(prompt)
+        handle = await thread.turn(
+            input=[TextInput(prompt), SkillInput(name="planskill", path=str(self.workdir / "agent" / "planner" / "schemaplan.json"))]
+            #schema=schema
+        )
         
         stream = handle.stream()
         
@@ -178,7 +154,30 @@ class Planner:
             print(result.final_response)  
         finally:
             await stream.aclose()
-        
+
+        '''
+        async for notification in handle.stream():
+              # 1️⃣ 记录日志
+              logging.info(f"[{notification.method}] {notification.payload}")
+
+              # 2️⃣ 实时输出用户可见内容
+              if notification.method == "item/agentMessage/delta":
+                  print(notification.payload.delta, end="", flush=True)
+
+              # 3️⃣ 检测完成事件，手动收集结果
+              if (
+                  notification.method == "turn/completed"
+                  and isinstance(notification.payload, TurnCompletedNotification)
+                  and notification.payload.turn.id == handle.id
+              ):
+                  # 复用 _collect_async_run_result 的逻辑（或直接提取）
+                  from codex_app_server._run import _raise_for_failed_turn
+                  _raise_for_failed_turn(notification.payload.delta)
+                  # 提取 final_response（简化版，完整逻辑见 _run.py）
+                  final_result = notification.payload.delta
+                  break  # 流结束
+        '''
+
         try:
             plan = json.loads(result.final_response)
         except json.JSONDecodeError:
@@ -207,7 +206,7 @@ class Builder:
             return prompt_path.read_text(encoding="utf-8")
         return None
     
-    async def run(self, plan: dict = None) -> dict:
+    async def run(self, engine, plan: dict = None) -> dict:
         """读取 plan.json（或使用传入的计划），执行步骤，返回解决方案"""
         plan_path = self.workdir / "workspace" / "plan" / "plan.json"
         if not plan_path.exists() and not plan:
@@ -238,7 +237,6 @@ class Builder:
             developer_instructions=developer_instructions,
             base_instructions=base_instructions
         )
-        
         prompt = f"{json.dumps(plan, indent=2)}"
         handle = await thread.turn(input = TextInput(prompt))
         stream = handle.stream()
@@ -278,7 +276,7 @@ class Evaluator:
             return prompt_path.read_text(encoding="utf-8")
         return None
     
-    async def run(self, solution: dict = None) -> dict:
+    async def run(self, engine,solution: dict = None) -> dict:
         """读取 solu.json（或使用传入的解决方案），执行评估，返回评估结果"""
         solu_path = self.workdir / "workspace" / "solution" / "solu.json"
         if not solu_path.exists() and not solution:
@@ -370,9 +368,9 @@ class AsyncWorkflowEngine:
             params = self._replace_params(step.get("params", {}), loop_index)
             info_logger(f"  [执行任务] {name}")
             if params:
-                return await func(self, **params)
+                return await func(selfcd, **params)
             else:
-                return await func()
+                return await func(self)
 
         # 顺序管线：按顺序执行多个子任务
         elif stype == "pipeline":

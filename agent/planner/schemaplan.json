@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "title": "Plan",
+  "required": ["problem", "steps"],
+  "properties": {
+    "problem": {
+      "type": "string",
+      "description": "待解决的整体问题"
+    },
+    "steps": {
+      "type": "array",
+      "description": "执行步骤列表",
+      "items": {
+        "type": "object",
+        "required": ["step", "status"],
+        "properties": {
+          "step": {
+            "type": "string",
+            "description": "单步任务内容"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "running", "success", "failed"],
+            "description": "步骤状态"
+          }
+        }
+      }
+    }
+  }
+}

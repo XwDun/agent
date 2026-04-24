@@ -1,21 +1,29 @@
 {
-  "problem": "find the time a ball fall onto the ground at height H.",
+  "problem": "Find $\\int \\sqrt{1 - x} x^2 dx$",
   "plan": [
     {
-      "step": "Identify the physics model: free fall under constant gravitational acceleration g, starting from rest (initial velocity = 0).",
-      "status": "completed"
+      "step": "Use substitution: let u = 1 - x, so x = 1 - u and dx = -du",
+      "status": "pending"
     },
     {
-      "step": "Apply the kinematic equation for displacement: H = (1/2)gt\u00b2, where H is height, g is gravitational acceleration (~9.8 m/s\u00b2), and t is time.",
-      "status": "completed"
+      "step": "Rewrite the integral: \u222b\u221a(1-x)\u00b7x\u00b2 dx = -\u222bu^(1/2)\u00b7(1-u)\u00b2 du",
+      "status": "pending"
     },
     {
-      "step": "Solve for time t: rearrange to get t = \u221a(2H/g).",
-      "status": "completed"
+      "step": "Expand (1-u)\u00b2 = 1 - 2u + u\u00b2 and distribute u^(1/2)",
+      "status": "pending"
     },
     {
-      "step": "Present the final formula and note assumptions: no air resistance, constant g, ball starts from rest, and H is measured in meters for SI units.",
-      "status": "in_progress"
+      "step": "Integrate term by term using power rule: \u222bu^n du = u^(n+1)/(n+1)",
+      "status": "pending"
+    },
+    {
+      "step": "Substitute back u = 1-x and simplify the expression",
+      "status": "pending"
+    },
+    {
+      "step": "Verify by differentiating the result to confirm it equals x\u00b2\u221a(1-x)",
+      "status": "pending"
     }
   ]
 }

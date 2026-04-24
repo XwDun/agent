@@ -1,22 +1,30 @@
 {
-  "problem": "find the time a ball fall onto the ground at height H.",
+  "problem": "Find $\\int \\sqrt{1 - x} x^2 dx$",
   "plan": [
     {
-      "step": "Identify the physics model: free fall under constant gravitational acceleration g, starting from rest (initial velocity = 0).",
+      "step": "Use substitution: let u = 1 - x, so x = 1 - u and dx = -du",
       "status": "completed"
     },
     {
-      "step": "Apply the kinematic equation for displacement: H = (1/2)gt\u00b2, where H is height, g is gravitational acceleration (~9.8 m/s\u00b2), and t is time.",
+      "step": "Rewrite the integral: \u222b\u221a(1-x)\u00b7x\u00b2 dx = -\u222bu^(1/2)\u00b7(1-u)\u00b2 du",
       "status": "completed"
     },
     {
-      "step": "Solve for time t: rearrange to get t = \u221a(2H/g).",
+      "step": "Expand (1-u)\u00b2 = 1 - 2u + u\u00b2 and distribute u^(1/2)",
       "status": "completed"
     },
     {
-      "step": "Present the final formula and note assumptions: no air resistance, constant g, ball starts from rest, and H is measured in meters for SI units.",
+      "step": "Integrate term by term using power rule: \u222bu^n du = u^(n+1)/(n+1)",
+      "status": "completed"
+    },
+    {
+      "step": "Substitute back u = 1-x and simplify the expression",
+      "status": "completed"
+    },
+    {
+      "step": "Verify by differentiating the result to confirm it equals x\u00b2\u221a(1-x)",
       "status": "completed"
     }
   ],
-  "solution": "The time t for a ball to fall from height H to the ground under free fall is:\n\n  t = \u221a(2H / g)\n\nwhere:\n  \u2022 t = time in seconds (s)\n  \u2022 H = initial height in meters (m)\n  \u2022 g = gravitational acceleration \u2248 9.8 m/s\u00b2 (on Earth's surface)\n\nExample: If H = 19.6 m, then t = \u221a(2\u00d719.6 / 9.8) = \u221a4 = 2 seconds.\n\nAssumptions:\n  1. The ball starts from rest (initial velocity v\u2080 = 0)\n  2. Air resistance is negligible\n  3. Gravitational acceleration g is constant over the fall distance\n  4. Motion is purely vertical with no horizontal component\n  5. H is measured in meters for SI unit consistency (if using feet, use g \u2248 32 ft/s\u00b2)\n\nNote: For very large H or high precision applications, variations in g with altitude and air drag may need to be considered."
+  "solution": "$$\\int \\sqrt{1-x} \\cdot x^2 \\, dx = -\\frac{2}{3}(1-x)^{3/2} + \\frac{4}{5}(1-x)^{5/2} - \\frac{2}{7}(1-x)^{7/2} + C$$\n\n**Work:**\n\n1. **Substitution**: Let $u = 1-x$, so $x = 1-u$ and $dx = -du$\n\n2. **Rewrite**:\n   $$\\int \\sqrt{1-x} \\cdot x^2 \\, dx = -\\int u^{1/2}(1-u)^2 \\, du$$\n\n3. **Expand and distribute**:\n   $$-\\int u^{1/2}(1-2u+u^2) \\, du = -\\int \\left(u^{1/2} - 2u^{3/2} + u^{5/2}\\right) \\, du$$\n\n4. **Integrate term by term**:\n   $$-\\left[\\frac{u^{3/2}}{3/2} - 2\\cdot\\frac{u^{5/2}}{5/2} + \\frac{u^{7/2}}{7/2}\\right] + C = -\\frac{2}{3}u^{3/2} + \\frac{4}{5}u^{5/2} - \\frac{2}{7}u^{7/2} + C$$\n\n5. **Substitute back** $u = 1-x$:\n   $$\\boxed{-\\frac{2}{3}(1-x)^{3/2} + \\frac{4}{5}(1-x)^{5/2} - \\frac{2}{7}(1-x)^{7/2} + C}$$\n\n6. **Verification**: Differentiating the result:\n   $$\\frac{d}{dx}\\left[-\\frac{2}{3}(1-x)^{3/2} + \\frac{4}{5}(1-x)^{5/2} - \\frac{2}{7}(1-x)^{7/2}\\right] = \\sqrt{1-x} - 2(1-x)^{3/2} + (1-x)^{5/2}$$\n   $$= \\sqrt{1-x}\\left[1 - 2(1-x) + (1-x)^2\\right] = \\sqrt{1-x}\\cdot x^2 \\quad \\checkmark$$"
 }
